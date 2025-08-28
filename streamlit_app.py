@@ -37,6 +37,12 @@ if 'signature_created' not in st.session_state:
     st.session_state.signature_created = False
 if 'message_sent' not in st.session_state:
     st.session_state.message_sent = False
+if 'verification_done' not in st.session_state:
+    st.session_state.verification_done = False
+if 'verification_result' not in st.session_state:
+    st.session_state.verification_result = None
+if 'received_hash' not in st.session_state:
+    st.session_state.received_hash = None
 
 
 def generate_keypair():
@@ -93,15 +99,22 @@ st.header("0. 準備：送信者の鍵ペアを用意しよう")
 if st.button("🔑 送信者の「公開鍵🔓」と「秘密鍵🔑」を生成する"):
     st.session_state.private_key, st.session_state.public_key = generate_keypair()
     st.session_state.keys_generated = True
-    
+    # 鍵表示用のランダム文字列を生成してセッション状態に保存
+    st.session_state.private_display = "RSA-2048-PRIVATE-" + secrets.token_hex(8).upper()
+    st.session_state.public_display = "RSA-2048-PUBLIC-" + secrets.token_hex(8).upper()
+
+# 鍵が生成されている場合は表示
+if st.session_state.keys_generated:
     st.success("鍵ペアが生成されました！")
     
-    # 鍵の表示（簡略化されたバージョン）
-    private_display = "RSA-2048-PRIVATE-" + secrets.token_hex(8).upper()
-    public_display = "RSA-2048-PUBLIC-" + secrets.token_hex(8).upper()
+    # セッション状態から鍵表示情報を取得
+    if 'private_display' not in st.session_state:
+        st.session_state.private_display = "RSA-2048-PRIVATE-" + secrets.token_hex(8).upper()
+    if 'public_display' not in st.session_state:
+        st.session_state.public_display = "RSA-2048-PUBLIC-" + secrets.token_hex(8).upper()
     
-    st.info(f"🔓 **公開鍵**: `{public_display}`  \nこれは本人証明に使うため、みんなに公開します。")
-    st.warning(f"🔑 **秘密鍵**: `{private_display}`  \nこれは署名に使うため、絶対に本人しか知りません。")
+    st.info(f"🔓 **公開鍵**: `{st.session_state.public_display}`  \nこれは本人証明に使うため、みんなに公開します。")
+    st.warning(f"🔑 **秘密鍵**: `{st.session_state.private_display}`  \nこれは署名に使うため、絶対に本人しか知りません。")
 
 st.markdown("---")
 
@@ -122,7 +135,9 @@ if st.session_state.keys_generated:
         st.session_state.original_message = message
         st.session_state.message_hash = create_hash(message)
         st.session_state.hash_calculated = True
-        
+    
+    # ハッシュが計算されている場合は表示
+    if st.session_state.hash_calculated:
         st.success("ハッシュ値が計算されました！")
         st.code(st.session_state.message_hash)
         st.info("💡 **解説**: ハッシュ値は、メッセージを要約した「指紋」のようなものです。メッセージが1文字でも変わると、全く違う指紋になります。")
@@ -137,7 +152,9 @@ if st.session_state.keys_generated:
                 st.session_state.private_key
             )
             st.session_state.signature_created = True
-            
+        
+        # 署名が作成されている場合は表示
+        if st.session_state.signature_created:
             st.success("デジタル署名が作成されました！")
             st.code(st.session_state.digital_signature)
             st.info("💡 **解説**: 「送信者の秘密鍵」という、世界で一つだけの印鑑でハッシュ値に封をしました。これがデジタル署名です。")
@@ -148,7 +165,9 @@ if st.session_state.keys_generated:
         
         if st.button("📤 メッセージ、デジタル署名、公開鍵の3点セットを送信する"):
             st.session_state.message_sent = True
-            
+        
+        # 送信が完了している場合は表示
+        if st.session_state.message_sent:
             st.success("📤 **送信完了！**")
             
             # 送信内容を表示
@@ -166,8 +185,7 @@ if st.session_state.keys_generated:
                 
                 with col3:
                     st.markdown("**🔓 公開鍵**")
-                    public_display = "RSA-2048-PUBLIC-" + secrets.token_hex(4).upper()
-                    st.code(public_display + "...")
+                    st.code(st.session_state.public_display[:16] + "...")
 
 else:
     st.warning("⚠️ まず最初に送信者の鍵ペアを生成してください。")
@@ -195,11 +213,15 @@ if st.session_state.message_sent:
     st.subheader("ステップ5: 署名とメッセージを検証する")
     
     if st.button("🔍 このメッセージが本物か検証する！"):
+        # 受信したメッセージのハッシュを計算
+        st.session_state.received_hash = create_hash(received_message)
+        st.session_state.verification_result = st.session_state.message_hash == st.session_state.received_hash
+        st.session_state.verification_done = True
+    
+    # 検証が実行されている場合は結果を表示
+    if st.session_state.verification_done:
         # 2つの処理を並べて表示
         col1, col2 = st.columns(2)
-        
-        # 受信したメッセージのハッシュを計算
-        received_hash = create_hash(received_message)
         
         # 署名から元のハッシュを復号
         original_hash_from_signature = verify_signature(
@@ -215,12 +237,12 @@ if st.session_state.message_sent:
         with col2:
             st.markdown("**② 受信したメッセージから、新たに指紋を計算する**")
             st.markdown("（改ざんされたかもしれない）メッセージ全体のハッシュ値を計算します。")
-            st.code(f"計算した指紋(B): {received_hash}")
+            st.code(f"計算した指紋(B): {st.session_state.received_hash}")
         
         # ステップ6: 最終判定
         st.subheader("ステップ6: 最終判定")
         
-        if st.session_state.message_hash == received_hash:
+        if st.session_state.verification_result:
             st.success("✅ **検証成功！** 2つの指紋が一致しました。このメッセージは【送信者本人】から送られ、【改ざんされていない】ことが証明されました！")
         else:
             st.error("❌ **検証失敗！** 2つの指紋が一致しません。このメッセージは【改ざんされた】か【なりすまし】の危険があります！")
@@ -235,15 +257,33 @@ if st.session_state.message_sent:
         
         with comparison_col2:
             st.markdown("**指紋B（受信メッセージから計算）**")
-            st.code(received_hash)
+            st.code(st.session_state.received_hash)
         
-        if st.session_state.message_hash == received_hash:
+        if st.session_state.verification_result:
             st.markdown("🎉 **一致！** → メッセージは信頼できます")
         else:
             st.markdown("⚠️ **不一致！** → メッセージに問題があります")
 
 else:
     st.warning("⚠️ まず最初にパート1で送信者の操作を完了してください。")
+
+# リセット機能
+st.markdown("---")
+
+# アプリ全体をリセットするボタン
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2:
+    if st.button("🔄 アプリを最初からやり直す"):
+        # セッション状態をリセット
+        for key in ['keys_generated', 'private_key', 'public_key', 'private_display', 'public_display',
+                   'original_message', 'message_hash', 'digital_signature', 'hash_calculated',
+                   'signature_created', 'message_sent', 'verification_done', 'verification_result',
+                   'received_hash']:
+            if key in st.session_state:
+                del st.session_state[key]
+        
+        st.success("✨ アプリがリセットされました！ページを再読み込みして最初からお試しください。")
+        st.rerun()
 
 # まとめ
 st.markdown("---")
