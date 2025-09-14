@@ -6,13 +6,13 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 # アプリケーションのタイトルと基本設定
 st.set_page_config(
-    page_title="デジタル署名体験アプリ",
+    page_title="デジタル署名",
     page_icon="🔐",
     layout="wide"
 )
 
 # タイトル
-st.title("🔐 デジタル署名の仕組み体験アプリ")
+st.title("🔐 デジタル署名（pp.126-127）")
 st.caption("Created by Dit-Lab.(Daiki ITO)")
 st.caption("Supported by Tomoaki ATSUMI")
 
