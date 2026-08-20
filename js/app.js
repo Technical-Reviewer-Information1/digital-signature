@@ -178,6 +178,12 @@
     $('qScore').textContent = qScore; $('qNext').disabled = false;
   }
 
+  /* 本文の問題 */
+  function drawBook() {
+    if (!document.getElementById('bookBox')) return;
+    window.Quiz.choice('bookBox', 'bookNote', [{"k": "ア・イ", "q": "デジタル署名に関する記述として適当なもの（2つのうちの1つ）。", "ch": ["通信経路上での第三者による盗み見を防止できる", "データを暗号化して送信できるため情報漏洩を防げる", "送信されたデータが改ざんされていないことを確認できる", "送信されたデータのどこが改ざんされたのか特定できる", "送信されたデータが送信者本人のものであるか確認できる"], "a": "2|4", "why": "署名でできるのは<strong>改ざんの検出</strong>と<strong>本人確認</strong>の2つ。⓪①は暗号化の話で、署名では本文は隠れません。③の「どこが」までは分かりません。STEP 4 で確かめられます。"}, {"k": "ウ", "q": "手順2：要約文（ハッシュ値）を暗号化するのに使う鍵は。", "ch": ["送信者の公開鍵", "送信者の秘密鍵", "送信者の共通鍵", "受信者の公開鍵", "受信者の秘密鍵", "受信者の共通鍵"], "a": 1, "why": "<strong>送信者の秘密鍵</strong>です。本人しか持っていない鍵で暗号化するからこそ、本人の署名になります。"}, {"k": "エ", "q": "手順4：受信者が暗号化された要約文を復号するのに使う鍵は。", "ch": ["送信者の公開鍵", "送信者の秘密鍵", "送信者の共通鍵", "受信者の公開鍵", "受信者の秘密鍵", "受信者の共通鍵"], "a": 0, "why": "<strong>送信者の公開鍵</strong>です。暗号化とは鍵の使い方が逆（秘密鍵で閉めて公開鍵で開ける）になるのが署名の特徴です。"}], "本文の答えは【ア】・【イ】②・④（順不同）　【ウ】①　【エ】⓪ です。");
+  }
+
   function init() {
     $('doc1').addEventListener('input', drawHash);
     document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
@@ -202,6 +208,7 @@
     window.Terms.glossary($('glossBox'), ['デジタル署名', 'ハッシュ値', '公開鍵暗号方式', '共通鍵暗号方式', '認証局', 'SSL/TLS']);
     $('doc1').value = ORIG; $('recvDoc').value = ORIG;
     drawHash(); drawSig(); drawVerify(); startQuiz();
+    drawBook();
     window.Terms.attach();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
