@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>デジタル署名｜情報Ⅰ共通テスト対策問題集</title>
+<meta name="description" content="デジタル署名でわかるのは「本人が書いたか」と「変えられていないか」の2つだけです。改ざんを起こして、検出されるようすを見てみましょう。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2315181c%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E01%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="inner">
+    <span class="eyebrow">第 4 章　情報通信ネットワーク　4-11</span>
+    <h1>デジタル署名（pp.126-127）</h1>
+    <p class="lead">デジタル署名でわかるのは「本人が書いたか」と「変えられていないか」の2つだけです。改ざんを起こして、検出されるようすを見てみましょう。</p>
+    <p class="credit">Created by Dit-Lab.(Daiki ITO)　/　Supported by Tomoaki ATSUMI</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="step" id="step1">
+    <h2><span class="no">STEP 1</span>ハッシュ値を作ってみる</h2>
+    <p class="desc"><span class="term" data-t="ハッシュ値">ハッシュ値</span>は文書の「要約」。<strong>1文字でも変わると、まったくちがう値</strong>になります。</p>
+
+    <div class="panel">
+      <label class="fld" for="doc1">文書</label>
+      <textarea id="doc1" rows="3" spellcheck="false">明日の集合時間は9時です。</textarea>
+      <div class="hashout" id="hash1" style="margin-top:12px"></div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn" data-edit="9時→10時">「9時」を「10時」に変える</button>
+        <button class="btn" data-edit="。→!">句点を「!」に変える</button>
+        <button class="btn ghost" id="resetDoc">元に戻す</button>
+      </div>
+      <div class="note" id="hashNote" style="margin-top:12px"></div>
+      <div class="note info" style="margin-top:12px">
+        ハッシュ値の特徴：<strong>①どんな長さの文書でも同じ長さになる ②同じ文書からは必ず同じ値になる
+        ③少しでも変わると値が大きく変わる ④ハッシュ値から元の文書は復元できない</strong>。
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step2">
+    <h2><span class="no">STEP 2</span>署名と検証の手順</h2>
+    <p class="desc"><strong>暗号化とは鍵の使い方が逆</strong>です。ここが最重要ポイント。</p>
+    <div class="panel">
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn primary" id="sigNext">次の手順へ ▶</button>
+        <button class="btn ghost" id="sigReset">最初から</button>
+        <span class="badge" id="sigStage"></span>
+      </div>
+      <div id="sigBox"></div>
+      <div class="note" id="sigNote" style="margin-top:12px"></div>
+      <div class="note warn" style="margin-top:12px">
+        <strong>覚え方。</strong>暗号化は「<strong>受信者</strong>の公開鍵で閉めて、<strong>受信者</strong>の秘密鍵で開ける」。
+        デジタル署名は「<strong>送信者</strong>の秘密鍵で閉めて、<strong>送信者</strong>の公開鍵で開ける」。
+        <strong>目的がちがえば使う鍵もちがいます。</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step3">
+    <h2><span class="no">STEP 3</span>改ざんを起こしてみる</h2>
+    <p class="desc">通信の途中で文書を書きかえると、検証がどうなるかを確かめます。</p>
+    <div class="panel">
+      <div class="grid c2">
+        <div>
+          <h3 style="font-size:.86rem;color:var(--ink-2)">送信者が署名した文書</h3>
+          <div class="msgline" id="origDoc" style="font-family:var(--mono);border:1px solid var(--rule-2);background:var(--paper);padding:10px"></div>
+          <div style="font-size:.8rem;color:var(--ink-2);margin-top:8px">署名（ハッシュ値を秘密鍵で暗号化したもの）</div>
+          <div class="hashout" id="sigVal" style="font-size:1rem"></div>
+        </div>
+        <div>
+          <h3 style="font-size:.86rem;color:var(--ink-2)">受信者が受け取った文書（ここを書きかえられる）</h3>
+          <textarea id="recvDoc" rows="3" spellcheck="false" style="font-family:var(--mono)"></textarea>
+          <div class="btn-row" style="margin-top:10px">
+            <button class="btn" id="tamper">途中で1文字書きかえる</button>
+            <button class="btn ghost" id="restore">元にもどす</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid c2" style="margin-top:14px">
+        <div><div style="font-size:.8rem;color:var(--ink-2)">受け取った文書から計算したハッシュ値</div>
+          <div class="hashout" id="hashRecv" style="font-size:1rem"></div></div>
+        <div><div style="font-size:.8rem;color:var(--ink-2)">署名を公開鍵で復号したハッシュ値</div>
+          <div class="hashout" id="hashSig" style="font-size:1rem"></div></div>
+      </div>
+      <div class="verdict" id="verdict" style="margin-top:14px"></div>
+      <div class="note" id="verNote" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <section class="step" id="step4">
+    <h2><span class="no">STEP 4</span>できること・できないこと</h2>
+    <div class="grid c2">
+      <div class="panel"><h3 style="color:var(--ok)">デジタル署名でできること</h3>
+        <ul style="margin:0;padding-left:1.1em;font-size:.88rem;line-height:2;color:var(--ink-2)">
+          <li>送られたデータが<strong>送信者本人のもの</strong>か確認できる（認証）</li>
+          <li>送られたデータが<strong>改ざんされていない</strong>ことを確認できる（完全性）</li>
+          <li>あとから「送っていない」と言えなくする（否認防止）</li>
+        </ul>
+      </div>
+      <div class="panel"><h3 style="color:var(--ng)">デジタル署名ではできないこと</h3>
+        <ul style="margin:0;padding-left:1.1em;font-size:.88rem;line-height:2;color:var(--ink-2)">
+          <li><strong>盗み見を防ぐこと</strong>（文書そのものは暗号化されていない）</li>
+          <li><strong>情報漏洩を防ぐこと</strong>（内容を隠したいなら別に暗号化が必要）</li>
+          <li><strong>どこが改ざんされたか特定すること</strong>（変わったことはわかるが場所はわからない）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note warn" style="margin-top:14px">
+      共通テストでは「<strong>盗み見を防止できる</strong>」「<strong>どこが改ざんされたか特定できる</strong>」という選択肢がよく出ますが、
+      どちらも<strong>誤り</strong>です。
+    </div>
+  </section>
+
+  <section class="step" id="step5">
+    <h2><span class="no">STEP 5</span>確認クイズ</h2>
+    <div class="panel">
+      <div class="qhead">
+        <span class="badge" id="qProgress">1 / 1</span>
+        <span class="badge">正解 <span class="score" id="qScore">0</span></span>
+      </div>
+      <div class="card-q"><div class="q-scene" id="qText"></div></div>
+      <div class="choice4" id="qChoices"></div>
+      <div class="note" id="qFb" hidden style="margin-top:12px"></div>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn primary" id="qNext" disabled>次の問題</button>
+        <button class="btn ghost" id="qReset">最初から</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="glossary">
+    <h2><span class="no">用語</span>この節で出てくることば</h2>
+    <div id="glossBox"></div>
+  </section>
+
+  <section class="step">
+    <h2><span class="no">まとめ</span>デジタル署名のポイント</h2>
+    <ul style="margin:0;padding-left:1.2em;color:var(--ink-2);font-size:.92rem;line-height:2.05">
+      <li>手順：①ハッシュ値を作る →②<strong>送信者の秘密鍵</strong>で暗号化 →③文書と一緒に送る →④<strong>送信者の公開鍵</strong>で復号して照合。</li>
+      <li>2つのハッシュ値が一致すれば、<strong>本人のもので、改ざんされていない</strong>とわかる。</li>
+      <li>暗号化とは<strong>鍵の使い方が逆</strong>。目的（隠す／証明する）で使い分ける。</li>
+      <li><strong>盗み見は防げない</strong>。内容を隠したいなら別に暗号化する。</li>
+      <li>公開鍵が本物かどうかは<span class="term" data-t="認証局">認証局</span>が保証する。</li>
+    </ul>
+  </section>
+
+  <section class="step">
+    <h2><span class="no">活用</span>授業・探究での使い方</h2>
+    <div class="use-note">
+      <h3>授業で</h3>
+      <ul>
+        <li>STEP 1 で文書を1文字だけ書きかえ、ハッシュ値が大きく変わることを見せる。</li>
+        <li>STEP 2 の手順を1段階ずつ進め、暗号化とは鍵の使い方が逆であることを確認する。</li>
+        <li>STEP 3 の改ざん実験で、検証が失敗するようすを実際に確かめさせる。</li>
+      </ul>
+      <h3 style="margin-top:12px">探究で</h3>
+      <ul>
+        <li>ハッシュ値が同じ長さになる理由と、それが持つ意味を考える。</li>
+        <li>デジタル署名でできること・できないことを整理し、暗号化との役割分担を説明する。</li>
+        <li>身のまわりでデジタル署名が使われている場面（電子契約など）を調べる。</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  情報Ⅰ 共通テスト対策問題集（技術評論社）連動Webアプリ　/　Created by Dit-Lab.(Daiki ITO)　/　Supported by Tomoaki ATSUMI
+</footer>
+
+<script src="js/tools.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/terms.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
