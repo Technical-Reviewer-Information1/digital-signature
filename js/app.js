@@ -209,6 +209,33 @@
     $('doc1').value = ORIG; $('recvDoc').value = ORIG;
     drawHash(); drawSig(); drawVerify(); startQuiz();
     drawBook();
+    Worksheet.make('wsBox', {
+      name: 'digital-signature',
+      fields: [
+        { id: 'g1', label: '① 送りたいメッセージ', hint: '短い一文で。', rows: 2, ph: '例：明日の集合は9時です' },
+        { id: 'g2', label: '② 受け取る人が心配すること', hint: '本当に本人からか／途中で変えられていないか。', rows: 2,
+          ph: '例：なりすましで時間を変えられたら、全員が遅れる' },
+        { id: 'g3', label: '③ 送信者は何をするか', hint: 'ハッシュ値を求めて、何の鍵で暗号化するか。', rows: 3,
+          ph: '例：本文からハッシュ値を作り、自分の秘密鍵で暗号化して署名にする' },
+        { id: 'g4', label: '④ 受信者は何をするか', hint: 'どの鍵で戻し、何と何を比べるか。', rows: 3,
+          ph: '例：送信者の公開鍵で署名を戻し、自分で計算したハッシュ値と一致するか比べる' },
+        { id: 'g5', label: '⑤ 1文字変えたらどうなるか', hint: '予想 → 図で確認 → 結果。', rows: 3,
+          ph: '例：「9時」を「8時」に変えると、ハッシュ値が全く別の値になり、一致しないので改ざんが分かる' },
+        { id: 'g6', label: '⑥ 署名で分からないこと', hint: '署名は何を保証し、何を保証しないか。', rows: 2,
+          ph: '例：中身が第三者に読まれないことは保証しない（それは暗号化の役目）' }
+      ],
+      build: function (v, e) {
+        return '<h4>デジタル署名 確認シート</h4><dl>' +
+          '<dt>① メッセージ</dt><dd>' + e(v.g1) + '</dd>' +
+          '<dt>② 受信者の心配</dt><dd>' + e(v.g2) + '</dd>' +
+          '<dt>③ 送信者の手順</dt><dd>' + e(v.g3) + '</dd>' +
+          '<dt>④ 受信者の手順</dt><dd>' + e(v.g4) + '</dd>' +
+          '<dt>⑤ 改ざんしたときの結果</dt><dd>' + e(v.g5) + '</dd>' +
+          '<dt>⑥ 署名が保証しないこと</dt><dd>' + e(v.g6) + '</dd></dl>';
+      },
+      note: '⑥がいちばん間違えやすいところです。<strong>署名＝本人確認と改ざん検出</strong>、<strong>暗号化＝内容の秘密</strong>。'
+    });
+
     window.Terms.attach();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

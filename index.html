@@ -6,7 +6,7 @@
 <title>デジタル署名｜情報Ⅰ共通テスト対策問題集</title>
 <meta name="description" content="デジタル署名でわかるのは「本人が書いたか」と「変えられていないか」の2つだけです。改ざんを起こして、検出されるようすを見てみましょう。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2315181c%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E01%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css?v=1b60c856">
+<link rel="stylesheet" href="css/style.css?v=bdbb3cb0">
 <link rel="stylesheet" href="css/app.css?v=8e504ed6">
 </head>
 <body>
@@ -140,6 +140,12 @@
     <div class="note" id="bookNote" style="margin-top:10px"></div>
   </section>
 
+  <section class="step wsprint" id="wsSec">
+    <h2><span class="no">探究</span>自分のメッセージで「改ざん」を試す</h2>
+    <p class="desc">署名のしくみは、自分の文で試すといちばん腹に落ちます。送る文を決め、<strong>1文字だけ変えたら何が起きるか</strong>を予想してから STEP の図で確かめましょう。</p>
+    <div class="panel"><div id="wsBox"></div></div>
+  </section>
+
   <section class="step" id="glossary">
     <h2><span class="no">用語</span>この節で出てくることば</h2>
     <div id="glossBox"></div>
@@ -164,12 +170,14 @@
         <li>STEP 1 で文書を1文字だけ書きかえ、ハッシュ値が大きく変わることを見せる。</li>
         <li>STEP 2 の手順を1段階ずつ進め、暗号化とは鍵の使い方が逆であることを確認する。</li>
         <li>STEP 3 の改ざん実験で、検証が失敗するようすを実際に確かめさせる。</li>
+        <li>「探究」のシートで③④を自分のことばで書かせてから、STEPの図で答え合わせをする。</li>
       </ul>
       <h3 style="margin-top:12px">探究で</h3>
       <ul>
         <li>ハッシュ値が同じ長さになる理由と、それが持つ意味を考える。</li>
         <li>デジタル署名でできること・できないことを整理し、暗号化との役割分担を説明する。</li>
         <li>身のまわりでデジタル署名が使われている場面（電子契約など）を調べる。</li>
+        <li>⑥「署名が保証しないこと」を、暗号化との違いが分かる例で説明する。</li>
       </ul>
     </div>
   </section>
@@ -183,6 +191,7 @@
 <script src="js/tools.js?v=c07db610"></script>
 <script src="js/terms.js?v=92038844"></script>
 <script src="js/quiz.js?v=13402362"></script>
-<script src="js/app.js?v=a9f6130b"></script>
+<script src="js/worksheet.js?v=b6f4e4b3"></script>
+<script src="js/app.js?v=d0c857a7"></script>
 </body>
 </html>
