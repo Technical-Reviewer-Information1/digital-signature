@@ -185,6 +185,21 @@
   }
 
   function init() {
+    if (document.getElementById('chkBox')) {
+      window.Quiz.judge('chkBox', 'chkNote', [
+        { k: '1', t: 'デジタル署名があれば、途中の人に文書を読まれないようにできる。', ok: false,
+          why: '読まれないようにするのは<strong>暗号化</strong>の役目です。署名を付けても本文はそのまま読めます。' },
+        { k: '2', t: 'デジタル署名で、送った人が本人であることを確認できる。', ok: true,
+          why: '本人しか持っていない<strong>秘密鍵</strong>で作るので、公開鍵で戻せれば本人のものだと分かります。' },
+        { k: '3', t: 'デジタル署名で、文書が改ざんされていないことを確認できる。', ok: true,
+          why: '1文字でも変わるとハッシュ値が変わり、一致しなくなります。' },
+        { k: '4', t: 'デジタル署名は、送信者の公開鍵で作る。', ok: false,
+          why: '作るのは<strong>秘密鍵</strong>、確かめるのが公開鍵です。ここが逆になる間違いがとても多いところです。' },
+        { k: '5', t: 'あとから「そんな文書は送っていない」と言い逃れできなくなる。', ok: true,
+          why: '秘密鍵は本人しか持っていないので、否認できません（否認防止）。' }
+      ], '<strong>署名＝本人確認と改ざん検出、暗号化＝内容の秘密。</strong>この2つは役目がちがいます。');
+    }
+
     $('doc1').addEventListener('input', drawHash);
     document.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
       const [a, c] = b.dataset.edit.split('→');
